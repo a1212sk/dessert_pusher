@@ -18,6 +18,7 @@ package com.example.android.dessertpusher
 
 import android.content.ActivityNotFoundException
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -31,6 +32,7 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
+    private val KEY_REVENUE: String? = "REVENUE"
     private var revenue = 0
     private var dessertsSold = 0
     private lateinit var dessertTimer: DessertTimer
@@ -77,6 +79,12 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
 
         dessertTimer = DessertTimer(this.lifecycle)
 
+        if(savedInstanceState!=null){
+            revenue = savedInstanceState.getInt(KEY_REVENUE,0)
+            dessertsSold = savedInstanceState.getInt("KEY_DESSERT")
+            dessertTimer.secondsCount = savedInstanceState.getInt("KEY_TIME")
+        }
+
         // Set the TextViews to the right values
         binding.revenue = revenue
         binding.amountSold = dessertsSold
@@ -111,6 +119,20 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         super.onStop()
         Timber.i("onStop")
     }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState!!.putInt(KEY_REVENUE,revenue)
+        outState!!.putInt("KEY_DESSERT",dessertsSold)
+        outState!!.putInt("KEY_TIME",dessertTimer.secondsCount)
+
+        Timber.i("REVENUE "+revenue.toString())
+    }
+
 
     /**
      * Updates the score when the dessert is clicked. Possibly shows a new dessert.
